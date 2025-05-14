@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Card } from "react-native-paper";
+import ClassroomService from "../services/classroom.service";
 
 const ClassroomsScreen = () => {
   const [classrooms, setClassrooms] = useState([]);
@@ -11,16 +12,16 @@ const ClassroomsScreen = () => {
   }, []);
 
   const fetchAllClassrooms = async () => {
-    const response = await fetch("http://localhost:8000/api/classrooms");
-    const data = await response.json();
-    console.log(data);
-    setClassrooms(data);
+      const response = await ClassroomService.fetchAll();
+      console.log("ClassroomsScreen fetchAllClassrooms", response);
+      setClassrooms(response);
+      
   };
 
   return (
     <View>
       <View style={styles.classroomsContainer}>
-        {classrooms.map((classroom) => (
+        {classrooms?.map((classroom) => (
           <Card key={classroom.id}>
             <Card.Title title={classroom.name} titleStyle={styles.cardTitle} />
             <Card.Content>
