@@ -71,7 +71,7 @@ const ClassroomsScreen = () => {
 
       <View style={styles.filterButtonsContainer}>
         <Button
-          mode={selectedFilter === "name" ? "contained" : "outlined"} 
+          mode={selectedFilter === "name" ? "contained" : "outlined"}
           onPress={() => handleSort("name")}
           style={styles.filterButton}
         >
@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "blue",
   },
   classroomsContainer: {
     flexDirection: "column",

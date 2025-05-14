@@ -10,7 +10,7 @@ const ClassroomStack = () => {
       <Stack.Screen
         name="ClassroomsHome"
         component={ClassroomsScreen}
-        options={{ title: "Salles" }}
+        options={{ title: "Liste des salles" }}
       />
       <Stack.Screen
         name="ClassroomDetail"

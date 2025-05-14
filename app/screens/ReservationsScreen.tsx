@@ -77,7 +77,6 @@ const ReservationsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mes Réservations</Text>
       {reservations?.length ? (
         <View style={styles.reservationContainer}>
           {reservations.map((reservation) => (

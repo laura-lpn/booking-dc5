@@ -38,8 +38,6 @@ const ProfilScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profil</Text>
-
       <TextInput
         label="Nom"
         value={name}
@@ -59,7 +57,7 @@ const ProfilScreen = () => {
         Modifier
       </Button>
 
-      <Button mode="outlined"  onPress={signout} style={styles.logoutButton}>
+      <Button mode="outlined" onPress={signout} style={styles.logoutButton}>
         Déconnexion
       </Button>
     </View>
@@ -84,9 +82,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   button: {
-    marginTop: 16
+    marginTop: 16,
   },
   logoutButton: {
-    marginTop: 60
+    marginTop: 60,
   },
 });

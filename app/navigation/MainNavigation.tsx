@@ -1,4 +1,4 @@
-import { createStackNavigator } from "@react-navigation/stack"
+import { createStackNavigator } from "@react-navigation/stack";
 import TabNavigation from "./TabNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { useContext } from "react";
@@ -14,9 +14,9 @@ const MainNavigation = () => {
     <NavigationContainer>
       <Stack.Navigator>
         {!user ? (
-          <Stack.Screen name="Auth" component={AuthNavigation} />
+          <Stack.Screen name="Auth" component={AuthNavigation} options={{headerShown: false}}  />
         ) : (
-          <Stack.Screen name="Tab" component={TabNavigation} />
+          <Stack.Screen name="Tab" component={TabNavigation} options={{headerShown: false}}  />
         )}
       </Stack.Navigator>
     </NavigationContainer>
