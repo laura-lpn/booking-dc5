@@ -12,9 +12,15 @@ const getMyReservations = async () => {
   return response.data;
 }
 
+const remove = async (reservationId: string) => {
+  const response = await api.delete(`${ENDPOINT}/${reservationId}`);
+  return response.data;
+}
+
 const ReservationService = {
   create,
   getMyReservations,
+  remove,
 };
 
 export default ReservationService;

@@ -25,7 +25,7 @@ const ClassroomDetailScreen = ({
   route: RouteProp<{ params: { id: string } }, "params">;
 }) => {
   const { id } = route.params;
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [classroomDetails, setClassroomDetails] = useState<IClassroom | null>(
     null
   );
@@ -75,6 +75,10 @@ const ClassroomDetailScreen = ({
       });
       alert("Réservation enregistrée !");
       fetchClassroomDetails();
+      if (user) {
+        const updatedUser = await ReservationService.getMyReservations();
+        setUser({ ...user, reservations: updatedUser });
+      }
     } catch (error) {
       console.error("Erreur lors de la réservation :", error);
       alert("Erreur lors de la réservation.");

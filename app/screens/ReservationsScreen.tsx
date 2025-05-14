@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
 import { IReservation } from "../types/reservation.type";
 import ReservationService from "../services/reservation.service";
 import AuthContext from "../context/AuthContext";
-import { Card } from "react-native-paper";
+import { Button, Card } from "react-native-paper";
 
 const formatDateTime = (datetime: string | number | Date) => {
   const date = new Date(datetime);
@@ -18,15 +18,61 @@ const formatDateTime = (datetime: string | number | Date) => {
 
 const ReservationsScreen = () => {
   const [reservations, setReservations] = useState<IReservation[]>([]);
-  const { user } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchUserReservations();
+    if (!user?.reservations || user.reservations.length === 0) {
+      fetchUserReservations();
+    } else {
+      setReservations(user.reservations);
+    }
   }, [user]);
 
   const fetchUserReservations = async () => {
-    const response = await ReservationService.getMyReservations();
-    setReservations(response);
+    try {
+      const response = await ReservationService.getMyReservations();
+      setReservations(response);
+      if (user) {
+        setUser({ ...user, reservations: response });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des réservations :", error);
+    }
+  };
+
+  const handleDeleteReservation = (reservationId: string) => {
+    Alert.alert(
+      "Confirmer la suppression",
+      "Êtes-vous sûr de vouloir supprimer cette réservation ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await ReservationService.remove(reservationId);
+              const updatedReservations = reservations.filter(
+                (reservation) => reservation.id !== reservationId
+              );
+              setReservations(updatedReservations);
+              if (user) {
+                setUser({ ...user, reservations: updatedReservations });
+              }
+            } catch (error) {
+              console.error(
+                "Erreur lors de la suppression de la réservation :",
+                error
+              );
+              Alert.alert(
+                "Erreur",
+                "Une erreur est survenue lors de la suppression."
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -45,6 +91,14 @@ const ReservationsScreen = () => {
                   Salle : {reservation.classroom.name}
                 </Text>
               </Card.Content>
+              <Card.Actions>
+                <Button
+                  mode="contained"
+                  onPress={() => handleDeleteReservation(reservation.id)}
+                >
+                  Supprimer
+                </Button>
+              </Card.Actions>
             </Card>
           ))}
         </View>
