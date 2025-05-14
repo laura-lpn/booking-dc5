@@ -35,7 +35,8 @@ export const createReservation = async (c: Context) => {
 
 export const getMyReservations = async (c: Context) => {
   try {
-    const userId = c.get("userId");
+    const userContext = c.get("user");
+    const userId = userContext.userId;
     if (!userId) {
       return c.json({ error: "User not authenticated" }, 401);
     }
