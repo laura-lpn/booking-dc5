@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { IReservation } from "../types/reservation.type";
 import ReservationService from "../services/reservation.service";
 import AuthContext from "../context/AuthContext";
