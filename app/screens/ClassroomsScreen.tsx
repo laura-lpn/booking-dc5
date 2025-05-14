@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Card } from "react-native-paper";
+import { Button, Card } from "react-native-paper";
 import ClassroomService from "../services/classroom.service";
+import { useNavigation } from "@react-navigation/native";
+import { IClassroom } from "../types/classroom.type";
 
 const ClassroomsScreen = () => {
-  const [classrooms, setClassrooms] = useState([]);
+  const [classrooms, setClassrooms] = useState<IClassroom[]>([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    console.log("ClassroomsScreen useEffect");
     fetchAllClassrooms();
   }, []);
 
   const fetchAllClassrooms = async () => {
-      const response = await ClassroomService.fetchAll();
-      console.log("ClassroomsScreen fetchAllClassrooms", response);
-      setClassrooms(response);
-      
+    const response = await ClassroomService.fetchAll();
+    setClassrooms(response);
+  };
+
+  const handleViewDetails = (classroomId: number) => {
+    navigation.navigate("ClassroomDetail", { id: classroomId });
   };
 
   return (
@@ -26,6 +30,13 @@ const ClassroomsScreen = () => {
             <Card.Title title={classroom.name} titleStyle={styles.cardTitle} />
             <Card.Content>
               <Text>{classroom.capacity}</Text>
+              <Button
+                mode="outlined"
+                onPress={() => handleViewDetails(classroom.id)}
+                style={styles.button}
+              >
+                Voir les détails
+              </Button>
             </Card.Content>
           </Card>
         ))}
@@ -47,9 +58,11 @@ const styles = StyleSheet.create({
     gap: 10,
     padding: 10,
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "blue",
+    cardTitle: {
+      fontSize: 20,
+      fontWeight: "bold"
+    },
+  button: {
+    marginTop: 10,
   },
 });
