@@ -2,20 +2,19 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigation } from "@react-navigation/native";
 
-const SigninScreen = () => {
+const SignupScreen = () => {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
+    name: "",
   });
 
-  const { signin } = useAuth();
+  const { signup } = useAuth();
 
-  const navigation = useNavigation();
   return (
     <View style={styles.container}>
-      <Text>Signin Screen</Text>
+      <Text>Signup Screen</Text>
 
       <TextInput
         placeholder="Email"
@@ -28,21 +27,21 @@ const SigninScreen = () => {
           setCredentials({ ...credentials, password: text })
         }
       />
+      <TextInput
+        placeholder="Nom"
+        onChangeText={(text) => setCredentials({ ...credentials, name: text })}
+      />
       <Button
         mode="contained"
-        onPress={() => signin(credentials.email, credentials.password)}
+        onPress={() => signup(credentials.email, credentials.password, credentials.name)}
       >
-        Signin
+        S'inscrire
       </Button>
-
-      <Text>Vous n'avez pas de compte ?</Text>
-      {/* change de stack a click */}
-      <Button onPress={() => navigation.navigate("Signup")}>S'inscrire</Button>
     </View>
   );
 };
 
-export default SigninScreen;
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   container: {
