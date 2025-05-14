@@ -18,6 +18,16 @@ const formatDateTime = (datetime: string | number | Date) => {
 
 const ReservationsScreen = () => {
   const [reservations, setReservations] = useState<IReservation[]>([]);
+  const [upcomingReservations, setUpcomingReservations] = useState<
+    IReservation[]
+  >([]);
+  const [inProgressReservations, setInProgressReservations] = useState<
+    IReservation[]
+  >([]);
+  const [pastReservations, setPastReservations] = useState<IReservation[]>([]);
+  const [viewMode, setViewMode] = useState<"upcoming" | "inProgress" | "past">(
+    "inProgress"
+  );
   const { user, setUser } = useContext(AuthContext);
 
   useEffect(() => {
@@ -27,6 +37,32 @@ const ReservationsScreen = () => {
       setReservations(user.reservations);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (reservations.length) {
+      const now = new Date();
+
+      const upcoming = reservations.filter((reservation) => {
+        const startDate = new Date(reservation.startTime);
+        return startDate > now;
+      });
+
+      const inProgress = reservations.filter((reservation) => {
+        const startDate = new Date(reservation.startTime);
+        const endDate = new Date(reservation.endTime);
+        return startDate <= now && endDate >= now;
+      });
+
+      const past = reservations.filter((reservation) => {
+        const endDate = new Date(reservation.endTime);
+        return endDate < now;
+      });
+
+      setUpcomingReservations(upcoming);
+      setInProgressReservations(inProgress);
+      setPastReservations(past);
+    }
+  }, [reservations]);
 
   const fetchUserReservations = async () => {
     try {
@@ -75,34 +111,128 @@ const ReservationsScreen = () => {
     );
   };
 
+  const toggleView = (mode: "upcoming" | "inProgress" | "past") => {
+    setViewMode(mode);
+  };
+
   return (
     <View style={styles.container}>
-      {reservations?.length ? (
+      {/* Toggle Buttons */}
+      <View style={styles.toggleButtonsContainer}>
+        <Button
+          mode={viewMode === "upcoming" ? "contained" : "outlined"}
+          onPress={() => toggleView("upcoming")}
+          style={styles.toggleButton}
+        >
+          À venir
+        </Button>
+        <Button
+          mode={viewMode === "inProgress" ? "contained" : "outlined"}
+          onPress={() => toggleView("inProgress")}
+          style={styles.toggleButton}
+        >
+          En cours
+        </Button>
+        <Button
+          mode={viewMode === "past" ? "contained" : "outlined"}
+          onPress={() => toggleView("past")}
+          style={styles.toggleButton}
+        >
+          Passées
+        </Button>
+      </View>
+
+      {/* Réservations à venir */}
+      {viewMode === "upcoming" && (
         <View style={styles.reservationContainer}>
-          {reservations.map((reservation) => (
-            <Card key={reservation.id}>
-              <Card.Content>
-                <Text style={styles.reservationText}>
-                  Du {formatDateTime(reservation.startTime)} à{" "}
-                  {formatDateTime(reservation.endTime)}
-                </Text>
-                <Text style={styles.classroomText}>
-                  Salle : {reservation.classroom.name}
-                </Text>
-              </Card.Content>
-              <Card.Actions>
-                <Button
-                  mode="contained"
-                  onPress={() => handleDeleteReservation(reservation.id)}
-                >
-                  Supprimer
-                </Button>
-              </Card.Actions>
-            </Card>
-          ))}
+          {upcomingReservations.length ? (
+            upcomingReservations.map((reservation) => (
+              <Card key={reservation.id}>
+                <Card.Content>
+                  <Text style={styles.reservationText}>
+                    Du {formatDateTime(reservation.startTime)} à{" "}
+                    {formatDateTime(reservation.endTime)}
+                  </Text>
+                  <Text style={styles.classroomText}>
+                    Salle : {reservation.classroom.name}
+                  </Text>
+                </Card.Content>
+                <Card.Actions>
+                  <Button
+                    mode="contained"
+                    onPress={() => handleDeleteReservation(reservation.id)}
+                  >
+                    Supprimer
+                  </Button>
+                </Card.Actions>
+              </Card>
+            ))
+          ) : (
+            <Text style={styles.text}>Aucune réservation à venir.</Text>
+          )}
         </View>
-      ) : (
-        <Text style={styles.text}>Aucune réservation.</Text>
+      )}
+
+      {/* Réservations en cours */}
+      {viewMode === "inProgress" && (
+        <View style={styles.reservationContainer}>
+          {inProgressReservations.length ? (
+            inProgressReservations.map((reservation) => (
+              <Card key={reservation.id}>
+                <Card.Content>
+                  <Text style={styles.reservationText}>
+                    Du {formatDateTime(reservation.startTime)} à{" "}
+                    {formatDateTime(reservation.endTime)}
+                  </Text>
+                  <Text style={styles.classroomText}>
+                    Salle : {reservation.classroom.name}
+                  </Text>
+                </Card.Content>
+                <Card.Actions>
+                  <Button
+                    mode="contained"
+                    onPress={() => handleDeleteReservation(reservation.id)}
+                  >
+                    Supprimer
+                  </Button>
+                </Card.Actions>
+              </Card>
+            ))
+          ) : (
+            <Text style={styles.text}>Aucune réservation en cours.</Text>
+          )}
+        </View>
+      )}
+
+      {/* Réservations passées */}
+      {viewMode === "past" && (
+        <View style={styles.reservationContainer}>
+          {pastReservations.length ? (
+            pastReservations.map((reservation) => (
+              <Card key={reservation.id}>
+                <Card.Content>
+                  <Text style={styles.reservationText}>
+                    Du {formatDateTime(reservation.startTime)} à{" "}
+                    {formatDateTime(reservation.endTime)}
+                  </Text>
+                  <Text style={styles.classroomText}>
+                    Salle : {reservation.classroom.name}
+                  </Text>
+                </Card.Content>
+                <Card.Actions>
+                  <Button
+                    mode="contained"
+                    onPress={() => handleDeleteReservation(reservation.id)}
+                  >
+                    Supprimer
+                  </Button>
+                </Card.Actions>
+              </Card>
+            ))
+          ) : (
+            <Text style={styles.text}>Aucune réservation passée.</Text>
+          )}
+        </View>
       )}
     </View>
   );
@@ -121,6 +251,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
+  },
+  toggleButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 20,
+  },
+  toggleButton: {
+    flex: 1,
+    marginHorizontal: 10,
   },
   reservationContainer: {
     flexDirection: "column",
