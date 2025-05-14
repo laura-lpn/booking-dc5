@@ -35,6 +35,13 @@ export class ClassroomService {
   static async getClassroomById(id: number) {
     return prisma.classroom.findUnique({
       where: { id },
+      include: {
+        reservations: {
+          include: {
+            user: true,
+          },
+        },
+      },
     });
   }
 
