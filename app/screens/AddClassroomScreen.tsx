@@ -35,7 +35,6 @@ const AddClassroomScreen = () => {
         />
         <TextInput
           label="Équipements"
-          value={equipments.join(", ")}
           onChangeText={(text) =>
             setEquipments(text.split(",").map((item) => item.trim()))
           }

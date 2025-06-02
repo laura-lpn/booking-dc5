@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { IUser } from "../types/user.type";
 import { getToken } from "../utils/token";
-import AuthService from "../services/auth.service";
 import UserService from "../services/user.service";
 
 const AuthContext = createContext<{
