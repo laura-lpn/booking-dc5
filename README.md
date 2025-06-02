@@ -73,6 +73,8 @@ npm install yup @hookform/resolvers
 - [x] Ajout de la possibilité de filtrer les salles (par nom, par capacité, etc.)
 - [x] Ajout la possibilité de réordonner les salles dans la liste (par nom, par capacité, etc.)
 
+- [X] En tant que admin : Geston des salles
+
 ## Endpoints d'API
 
 ### Authentification

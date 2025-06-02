@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, Card } from "react-native-paper";
 import ClassroomService from "../services/classroom.service";
 import ReservationService from "../services/reservation.service";
 import AuthContext from "../context/AuthContext";
 import { IClassroom } from "../types/classroom.type";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const formatDateTime = (datetime: string | number | Date) => {
   const date = new Date(datetime);
@@ -30,6 +30,8 @@ const ClassroomDetailScreen = ({
     null
   );
 
+  const navigation = useNavigation();
+
   const [startDate, setStartDate] = useState(new Date());
   const [startTimeOnly, setStartTimeOnly] = useState(new Date());
   const [showDatePickerStart, setShowDatePickerStart] = useState(false);
@@ -43,6 +45,12 @@ const ClassroomDetailScreen = ({
   useEffect(() => {
     fetchClassroomDetails();
   }, [id]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchClassroomDetails();
+    }, [id])
+  );
 
   const fetchClassroomDetails = async () => {
     const response = await ClassroomService.fetchById(id);
@@ -85,6 +93,17 @@ const ClassroomDetailScreen = ({
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await ClassroomService.remove(id);
+      alert("Salle supprimée.");
+      navigation.navigate("ClassroomsHome");
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Erreur lors de la suppression.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {classroomDetails && (
@@ -96,6 +115,41 @@ const ClassroomDetailScreen = ({
           <Text style={styles.text}>
             Équipements : {classroomDetails.equipment.join(", ")}
           </Text>
+
+          {user && user.role === "ADMIN" && (
+            <View style={{ flexDirection: "row", gap: 10, marginVertical: 10 }}>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  navigation.navigate("EditClassroom", { id: id });
+                }}
+              >
+                Modifier
+              </Button>
+
+              <Button
+                mode="contained"
+                buttonColor="red"
+                textColor="white"
+                onPress={() =>
+                  Alert.alert(
+                    "Confirmer la suppression",
+                    "Es-tu sûr de vouloir supprimer cette salle ?",
+                    [
+                      { text: "Annuler", style: "cancel" },
+                      {
+                        text: "Supprimer",
+                        style: "destructive",
+                        onPress: handleDelete,
+                      },
+                    ]
+                  )
+                }
+              >
+                Supprimer
+              </Button>
+            </View>
+          )}
 
           <Text style={styles.subtitle}>Réservations :</Text>
 

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Button, Card, TextInput } from "react-native-paper";
 import ClassroomService from "../services/classroom.service";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { IClassroom } from "../types/classroom.type";
+import AuthContext from "../context/AuthContext";
 
 const ClassroomsScreen = () => {
   const [classrooms, setClassrooms] = useState<IClassroom[]>([]);
@@ -14,10 +15,17 @@ const ClassroomsScreen = () => {
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const navigation = useNavigation();
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
     fetchAllClassrooms();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchAllClassrooms();
+    }, [])
+  );
 
   useEffect(() => {
     filterAndSortClassrooms();
@@ -61,7 +69,17 @@ const ClassroomsScreen = () => {
     setFilteredClassrooms(filtered);
   };
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      {/* boutton d'ajout pour les admin */}
+      {user?.role === "ADMIN" && (
+        <Button
+          mode="contained"
+          onPress={() => navigation.navigate("AddClassroom")}
+          style={styles.addButton}
+        >
+          Ajouter une Salle
+        </Button>
+      )}
       <TextInput
         label="Rechercher par nom ou équipement"
         value={searchQuery}
@@ -103,7 +121,7 @@ const ClassroomsScreen = () => {
           </Card>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -143,5 +161,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 10,
+  },
+  addButton: {
+    marginBottom: 20,
   },
 });
